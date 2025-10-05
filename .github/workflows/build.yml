@@ -31,8 +31,9 @@ jobs:
         buildozer init || true
         buildozer -v android debug
 
-    - name: Upload APK artifact
-      uses: actions/upload-artifact@v4   # ✅ updated to v4
+       - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
       with:
         name: family-app-apk
         path: bin/*.apk
+
