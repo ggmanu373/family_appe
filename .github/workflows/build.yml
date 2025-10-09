@@ -19,7 +19,18 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt update
-        sudo apt install -y git zip unzip openjdk-17-jdk
+        sudo apt install -y git zip unzip openjdk-17-jdk wget
+
+    - name: Install Android SDK
+      run: |
+        mkdir -p $HOME/android-sdk
+        cd $HOME/android-sdk
+        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdtools.zip
+        unzip cmdtools.zip -d cmdline-tools
+        mkdir -p cmdline-tools/latest
+        mv cmdline-tools/cmdline-tools/* cmdline-tools/latest/
+        yes | cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/android-sdk --licenses
+        yes | cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/android-sdk "platform-tools" "platforms;android-33" "build-tools;33.0.2"
 
     - name: Install buildozer
       run: |
@@ -27,6 +38,9 @@ jobs:
         pip install buildozer cython
 
     - name: Build APK
+      env:
+        ANDROID_HOME: $HOME/android-sdk
+        PATH: $HOME/android-sdk/platform-tools:$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/build-tools/33.0.2:$PATH
       run: |
         buildozer init || true
         buildozer -v android debug
